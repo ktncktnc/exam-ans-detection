@@ -1,0 +1,16 @@
+pandas~=1.2.4
+opencv-python~=4.5.5.62
+tqdm~=4.62.3
+tensorflow-gpu~=2.7.0
+scikit-learn~=0.24.2
+keras~=2.7.0
+numpy~=1.19.5
+wand~=0.6.7
+libxml2~=2.9.12
+typing~=3.10.0.0s
+setuptools~=60.9.0
+qt~=5.12.9
+pyzmq~=22.3.0
+pillow
+scipy~=1.7.3
+scikit-image~=0.18.3
