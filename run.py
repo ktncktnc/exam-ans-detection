@@ -1,12 +1,28 @@
 import subprocess
-import os
 import glob
-import pandas as pd
 from src.yolo_process import *
 from wand.image import Image
 from tqdm import tqdm
-from numberOCR.deepmodel import *
 from numberOCR.numberorc import *
+import cv2
+
+
+def sharpen_images(input_path: str, output_path):
+    if input_path[-1] != '/':
+        input_path = input_path + "/"
+
+    if output_path[-1] != '/':
+        output_path = output_path + "/"
+
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+
+    kernel = np.array(([[0, -1, 0], [-1, 5, -1], [0, -1, 0]]), dtype=float)
+    files = os.listdir(input_path)
+    for f in tqdm(files):
+        im = cv2.imread(input_path + f)
+        im = cv2.filter2D(im, -1, kernel)
+        cv2.imwrite(output_path + f, im)
 
 
 def skew_correction(input_path: str, output_path):
@@ -45,7 +61,7 @@ def detect_answers(input_path, output_path, temp_folder='temp', darknet_path='da
         darknet="darknet.exe",
         data="data/answer.data",
         config="cfg/yolov4-answer.cfg",
-        weight="trained/50kep/yolov4-answer_last.weights",
+        weight="trained/260422/yolov4-answer_last.weights",
         output=os.path.join("../", output_path),
         input=os.path.join("../", temp_folder, "answer_files.txt")
     )
@@ -70,19 +86,20 @@ def detect_numbers(input_path, output_path, threshold=0.99998, checkpoint='numbe
 
 
 if __name__ == '__main__':
-    img_path = "all/VTF_DN_2022/DE_04/"
-    temp_folder = "temp/vtf_dn_2022/DE_04/"
-    skew_correction_folder = os.path.join(temp_folder, "skew_correction/answers")
+    img_path = "all/answer-18-4"
+    temp_folder = "temp/answer-18-4/"
+    skew_correction_folder = os.path.join(temp_folder, "skew_correction")
 
-    yolo_answers_path = temp_folder + "yolo_answers_04.txt"
-    numbers_path = os.path.join(temp_folder, "numbers_04.csv")
+    yolo_answers_path = temp_folder + "yolo_answers.txt"
+    numbers_path = os.path.join(temp_folder, "numbers.csv")
 
-    answers_path = os.path.join(temp_folder, "result_04.xlsx")
+    answers_path = os.path.join(temp_folder, "result.xlsx")
 
     if not os.path.exists(temp_folder):
         os.makedirs(temp_folder)
 
-    skew_correction(os.path.join(img_path, "answer"), skew_correction_folder)
-    detect_numbers(os.path.join(img_path, "number"), numbers_path)
+    # sharpen_images(os.path.join(img_path, "answer"), os.path.join(img_path, "sharpened"))
+    #skew_correction(os.path.join(img_path, "answer"), skew_correction_folder)
+    #detect_numbers(os.path.join(img_path, "number"), numbers_path)
     detect_answers(skew_correction_folder,  yolo_answers_path, temp_folder)
     results_to_xlsx(yolo_answers_path, numbers_path, answers_path, skew_correction_folder, save_img=True, save_img_path=temp_folder + "answer_imgs")

@@ -115,14 +115,22 @@ def yolo_result_to_xlsx(answers_path='result_answer.json',
 
 def answer_filename_to_number(name, answer_number_dif=-1, ended='_cut'):
     title, ext = os.path.splitext(os.path.basename(name))
-    number = re.findall(r'[0-9]+', title)[0]
-
-    n_digits = len(number)
+    ext = '.JPG'
+    title = str(title)
+    number_lastidx = len(title)
+    number_firstidx = number_lastidx - 1
+    while True:
+        if not title[number_firstidx - 1].isdigit():
+            break
+        number_firstidx -= 1
+    number = title[number_firstidx:number_lastidx]
     answer_number = str(int(number) + answer_number_dif)
-    answer_number = "0" * (n_digits - len(answer_number)) + answer_number
+
+    # n_digits = len(number)
+    # answer_number = "0" * (n_digits - len(answer_number)) + answer_number
 
     index = name.find(number)
-    answer_name = name[:index] + answer_number + ended + ext
+    answer_name = name[:number_firstidx] + answer_number + ended + ext
 
     return answer_name
 
@@ -163,6 +171,10 @@ def results_to_xlsx(answers_path='result_answer.json',
         4: "E"
     }
     with open(answers_path, "r") as jsonfile:
+        data = jsonfile.read().replace("\\", "\\\\")
+    with open(answers_path, "w") as jsonfile:
+        jsonfile.write(data)
+    with open(answers_path, "r") as jsonfile:
         answers_results = json.load(jsonfile)
 
     with open(numbers_path, "r") as csvfile:
@@ -179,7 +191,11 @@ def results_to_xlsx(answers_path='result_answer.json',
         confs = []
 
         number_filename = answer_filename_to_number(basename)
-        number_result = numbers_results[numbers_results['Filename'] == number_filename].iloc[0]
+        tmp_df = numbers_results[numbers_results['Filename'] == number_filename]
+        # if tmp_df.shape[0] == 0:
+        #     number_filename = answer_filename_to_number(basename, answer_number_dif=0)
+        # tmp_df = numbers_results[numbers_results['Filename'] == number_filename]
+        number_result = tmp_df.iloc[0]
 
         for idx, ans in enumerate(result['objects']):
             coords = ans['relative_coordinates']

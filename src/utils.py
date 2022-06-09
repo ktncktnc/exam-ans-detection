@@ -229,7 +229,7 @@ def crop_bboxes(img, lines, filename, savepath='2022\\crop_result', yolo_path=No
                     cv2.imwrite(os.path.join(savepath, name + f"_{write_i}" + ".jpg"), bbox)
 
                 if yolo_path is not None:
-                    ans = answers.loc[answers['filename'] == name].iloc[0]
+                    ans = answers.loc[answers['filename'].str.contains(name)].iloc[0]
                     txt_file.write("{an} {x} {y} {w} {h}\n".format(x=x_center, y=y_center, w=w, h=h, an=answer_mapper[ans['No.' + str(write_i + 1)]]))
 
                 write_i += 1

@@ -34,7 +34,7 @@ def detect_line(filepath, with_morpho_close=True, save_path=None, yolo_path=None
 
 
 if __name__ == '__main__':
-    files = os.listdir("all\\skew_corrected_answer")
+    files = os.listdir("../all/skew_correction")
     error_files = [
         "20220313173503863_0042", "20220313173612205_0012", "20220313173755479_0006", "20220313173755479_0008",
         "20220313173755479_0036", "20220313173850433_0012", "20220313173919210_0028", "20220313173945957_0030",
@@ -46,16 +46,16 @@ if __name__ == '__main__':
         "de_01_0032", "de_04_0038", "de_04_0064"
     ]
 
-    answers = pd.read_excel("all/answer_result.xlsx").reset_index()
+    answers = pd.read_excel("../all/all_answer_result.xlsx").reset_index()
 
     total = 0
-    for _filepath in tqdm(files[1400:]):
+    for _filepath in tqdm(files):
         base_name = os.path.basename(_filepath)[:-5]
         if base_name in error_files:
             continue
 
         with_morpho = True
-        total += detect_line(os.path.join("all\\skew_corrected_answer", _filepath), with_morpho, None,
+        total += detect_line(os.path.join("../all/skew_correction", _filepath), with_morpho, None,
                              "../all/yolo_data", answers)
 
     print("Total = " + str(total))
